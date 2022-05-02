@@ -1,12 +1,12 @@
 import random
+import parser
 
-with open('textfile.txt', 'r') as f:
-    strip = f.read().replace('\n', '')
-    print(strip)
+def write():
+    with open('input_text.txt', 'r') as input_text, open ('output_text.txt', 'a') as output_text:
+        paragraph = input_text.read().replace('\n',' ')
+        string = parser.find_sentences(paragraph)
+        output_text.write(random.choice(string))
+        output_text.write('\n')
 
-with open('textfile.txt') as f:
-    lines = f.readlines()
-    rand_line = random.randint(0, len(lines) - 1)
-    print(lines[rand_line])
 
 
