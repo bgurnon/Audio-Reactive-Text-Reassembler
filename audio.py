@@ -1,8 +1,8 @@
 import pyaudio
 import numpy as np
 import sys
-from peak_detect import real_time_peak_detection
-import main
+from tap_detect import real_time_peak_detection
+import writer
 
 RATE = 44100
 CHUNK = int(RATE/20)    # RATE / number of updates per second

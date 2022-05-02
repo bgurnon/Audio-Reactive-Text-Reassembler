@@ -7,13 +7,6 @@ Going to try creating a program to pull text from a .txt file
 
 Still unsure of how I want to "house" my program. Should I try and have it run on a website? Should I create a program to run from Pycharm that will be less accessible but will work for my purposes? Embedding a program in a website seems a bit beyond me at this point but the final product would be much better.
 
-https://stackoverflow.com/questions/40844903/how-to-run-python-script-in-html
-https://flask.palletsprojects.com/en/2.1.x/
-https://www.djangoproject.com/
-https://stackoverflow.com/questions/3980059/how-do-i-use-an-external-py-file
-https://stackoverflow.com/questions/4576077/how-can-i-split-a-text-into-sentences
-https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files
-
 https://stackoverflow.com/questions/40140660/print-random-line-from-txt-file
 H. REV. comes in clutch with the random line selector. Having trouble still with integrating the text parser, going to ignore this for now.
 
@@ -43,13 +36,13 @@ I managed to separate the parser from the main and test modules. The `import par
 I think for reactivity, I will try and have PyAudio detect the peaks of an incoming audio stream and use the peaks to trigger sentence selection.
 
 I collectivized some code from Reddit that prints i/o information using PyAudio functions.
-'import pyaudio
+`import pyaudio
 p = pyaudio.PyAudio()
 info = p.get_host_api_info_by_index(0)
 numdevices = info.get('deviceCount')
 for i in range(0, numdevices):
         if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
-            print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))'
+            print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))`
 https://www.reddit.com/r/learnpython/comments/s31hac/does_anyone_use_pyaudio_with_an_external_audio/
 
 I've gained an okayish understanding of how pyaudio works in a basic sense but figuring how to integrate that with arrays from numpy is the next step.
@@ -71,9 +64,12 @@ When trying to output text to another txt file, nothing is writing, time to do s
     output_text.write(random.choice(string))'
 
 FORTUNATELY, it was simply because the output file was named incorrectly. Moving on.
-Changed text editing mode to append so previous writes are logged
+Changed text editing mode to append so previous writes are logged downwards
 
-I found a peak detection algorithm that I am trying to integrate into the 'soundplot()' function in the audio stream module.
+I found a peak detection algorithm and a new base audio handler program from Laveena's scond post on the below link.
+https://stackoverflow.com/questions/48653745/continuesly-streaming-audio-signal-real-time-infinitely-python
+I wated to integrate user delica's peak detection algorithm into this base handler but 
+
 the function is 'def __init__(self, array, lag, threshold, influence):' and I cannot figure out what self and array are asking for, and there is no documentation.
 There aren't a lot of "readymades" for python realtime peak detection from what I have seen so I will work with this for a little longer before looking more.
 
@@ -84,6 +80,13 @@ Unsure what self even is or what I need to enter for it. Gonna look more into th
 After learning more about arrays, classes and understanding how some of the various peak detection algorithms work, I don't think using actual peak detection is feasible for my knowledge level. 
 I think it would be much more reasonable to just have a sentence get selected every time the amplitude of the input signal is greater than a threshold value.
 
-I found a person who created a script that detects "taps" in pyaudio, and it seems to work fairly okay
+I found a person who created a script that detects "taps" in pyaudio, and it seems to work fairly okay.
+User is Russell Borogove on StackOverflow
+I am using a shortened edited version of this code made by user1405612
+https://stackoverflow.com/questions/4160175/detect-tap-with-pyaudio-from-live-mic
+
 I've integrated my text selector into the new audio handler, but I can't monitor the output text live, the text updates after the program stops.
 I don't think it has to do with changes not being saved while I am viewing the file because using `with open()` should mean the file is closed every write instance.
+
+It turns out that Atom auto-refreshes text files, so now it's just a matter of fine tuning settings for the presentation. 
+Everything is working though.
