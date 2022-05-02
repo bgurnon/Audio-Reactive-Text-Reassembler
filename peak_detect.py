@@ -3,20 +3,20 @@ import struct
 import math
 import main
 
-INITIAL_TAP_THRESHOLD = 0.05
+INITIAL_TAP_THRESHOLD = 0.01
 FORMAT = pyaudio.paInt16 
 SHORT_NORMALIZE = (1.0/32768.0)
-INPUT_DEVICE_INDEX = 2
+INPUT_DEVICE_INDEX = 4
 CHANNELS = 1
 RATE = 44100  
 INPUT_BLOCK_TIME = 0.1
 INPUT_FRAMES_PER_BLOCK = int(RATE*INPUT_BLOCK_TIME)
 
-OVERSENSITIVE = 15.0/INPUT_BLOCK_TIME                    
+OVERSENSITIVE = 15.0/INPUT_BLOCK_TIME
 
-UNDERSENSITIVE = 50.0/INPUT_BLOCK_TIME # if we get this many quiet blocks in a row, decrease the threshold
+UNDERSENSITIVE = 150.0/INPUT_BLOCK_TIME # if we get this many quiet blocks in a row, decrease the threshold
 
-MAX_TAP_BLOCKS = 50.0/INPUT_BLOCK_TIME # if the noise was longer than this many blocks, it's not a 'tap'
+MAX_TAP_BLOCKS = 20.0/INPUT_BLOCK_TIME # if the noise was longer than this many blocks, it's not a 'tap'
 
 
 def get_rms(block):
@@ -56,7 +56,7 @@ noisycount = MAX_TAP_BLOCKS+1                          #|---- Variables for nois
 quietcount = 0                                         #|
 errorcount = 0                                         #]         
 
-for i in range(1000):
+for i in range(10000):
     try:                                                    #]
         block = stream.read(INPUT_FRAMES_PER_BLOCK)         #|
     except IOError as e:                                      #|---- just in case there is an error!
