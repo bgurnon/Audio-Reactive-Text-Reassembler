@@ -1,92 +1,31 @@
-# PoetryProject
- 
-3/31/22
-Downloaded Pycharm + Conda
-https://quick-adviser.com/how-do-you-randomly-select-a-line-from-a-file-in-python/
-Going to try creating a program to pull text from a .txt file
+# Audio-Based Text Reassembler
 
-Still unsure of how I want to "house" my program. Should I try and have it run on a website? Should I create a program to run from Pycharm that will be less accessible but will work for my purposes? Embedding a program in a website seems a bit beyond me at this point but the final product would be much better.
+### Summary
+My final product is a collection of modules that work together to:
+- parse a text input into sentences
+- analyze the amplitude of an audio input in 'realtime'
+- detect high amplitude, short decay sections
+- use those detected 'taps' to trigger to write a sentence to an output text file that can be viewed in realtime
 
-https://stackoverflow.com/questions/40140660/print-random-line-from-txt-file
-H. REV. comes in clutch with the random line selector. Having trouble still with integrating the text parser, going to ignore this for now.
+### Text Handling
+I began the project working on writer.py, which used functions from parser.py to parse text from input_text.txt and print a random sentence to the console. I later modified the module to write to output_text.txt for realtime monitoring in Atom.
+writer.py was based off of the work of H. Rev. on StackOverflow *[here](https://stackoverflow.com/questions/40140660/print-random-line-from-txt-file)*.
+parser.py was written by TennisVisuals on StackOverflow *[here](https://stackoverflow.com/questions/4576077/how-can-i-split-a-text-into-sentences)*.
 
-4/3/21
-As part of formatting,  I'm trying to remove line breaks from the text. I am attempting to use `strip(\n)` but keep getting an error saying: `strip = file.strip('\n')
-AttributeError: '_io.TextIOWrapper' object has no attribute 'strip`
+### Audio Handling
+For the audio stream portion of the program, I learned the basics of initiating an audio stream using Pyaudio, but the next steps of processing the audio stream from scratch would have required too much time for the deadline. Learning and integrating numpy or scipy peak finding algorithms was too much of a learning curve for the timeframe, plus I wasn't sure if the results would have been viable anyways. I was lucky enough to find some code made by Russell Borogove on StackOverflow *[here](https://stackoverflow.com/questions/4160175/detect-tap-with-pyaudio-from-live-mic)* that was created to detect taps on a microphone to trigger some other event in a live setting.
+I am using a shortened, edited version of this code made by user1405612.
 
-I think the random print block is working because the f.readLines doesn't need to recognize the text as a string, it just reads directly from the file. I think to strip all \n, the text maybe needs to be imported as a string?
+tap_detect.py breaks up an incoming audio stream into blocks and calculates the rms amplitude of each block. Based off of a threshold set by the user, the program will determine each incoming block as either loud or quiet, and it will register a "tap" if a certain number of loud blocks are followed by a certain number of quiet blocks. If there are too many loud or quiet blocks being registered, the threshold will be multiplied by 1.1 or 0.9 respectively to increase or decrease sensitivity. I integrated writer.py by calling write() whenever a tap is registered. The last element is io_check.py which is more a less a standalone module that I use to list the input devices for use in setting up tap_detect.py.
 
-4/7/21
-That was not it. I tried a bunch of stuff and forgot to document as I was going but basically what I have now is:
+### Problems I Faced
+Something that took me a while to figure out early on was how to correctly call functions from imported local modules. I found out after a while that the function needs to be called like `module.function`.
 
-`import random
-with open('textfile.txt', 'r+') as f:
-    paragraph = f.read().replace('\n',' ')
-    string = find_sentences(paragraph)
-    print(random.choice(string))`
+One dumb problem I faced was not realizing that in my writer function, I had the wrong .txt file name in `open()`. Understanding the read/write modes took a while as well.
 
-It successfully parses the text into sentences and prints a random sentence each time. My problem for this was I didn't really know
+A significant issue that I could not figure out was how to even integrate and use delica's peak detection algorithm from StackOverflow *[here](https://stackoverflow.com/questions/48653745/continuesly-streaming-audio-signal-real-time-infinitely-python)*. The lack of documentation combined with my basic understanding of Python resulted in me not knowing how to even use the functions provided. I still don't fully understand classes and `self`, nor do I fully understand arrays and how they are used in terms of signals like audio. These are points of interest for progressing in Python.
 
-I'm not quite sure why I got so fixated on parsing text now that I am writing this, though it's definitely a useful feature.
+The final issue I faced was live monitoring output_text.txt because Pycharm only refreshes files when moving between files. Most text and document viewers are the same, and this led me down the rabbit hole of log followers and niche software that seems to only exist for Windows and Linux. Fortunately, I discovered the Atom does auto-refresh and this is what I recommend for monitoring output_text.txt.
 
-I feel like I should have more to show for my work as of yet but I think I'm starting to get a better grasp on Python as a whole.
-
-I managed to separate the parser from the main and test modules. The `import parser` was greyed out at first because the IDE said it wasn't getting called even though it was, so I changed to `string = parser.find_sentences(paragraph)` and it works now.
-
-I think for reactivity, I will try and have PyAudio detect the peaks of an incoming audio stream and use the peaks to trigger sentence selection.
-
-I collectivized some code from Reddit that prints i/o information using PyAudio functions.
-`import pyaudio
-p = pyaudio.PyAudio()
-info = p.get_host_api_info_by_index(0)
-numdevices = info.get('deviceCount')
-for i in range(0, numdevices):
-        if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
-            print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))`
-https://www.reddit.com/r/learnpython/comments/s31hac/does_anyone_use_pyaudio_with_an_external_audio/
-
-I've gained an okayish understanding of how pyaudio works in a basic sense but figuring how to integrate that with arrays from numpy is the next step.
-
-This block gave an error message when starting up a stream saying `fromstring` is deprecated and to use `fromstring` instead to avoid unexpected results, so I made the switch.
-
-`def soundplot(stream):
-    t1=time.time()
-    data = np.frombuffer(stream.read(CHUNK),dtype=np.int16)
-    print(data)`
-
-
-When trying to output text to another txt file, nothing is writing, time to do some research
-
-'with open('input_text.txt', 'r+') as f, open ('output_text.txt', 'r+') as output_text:
-
-    paragraph = f.read().replace('\n',' ')
-    string = parser.find_sentences(paragraph)
-    output_text.write(random.choice(string))'
-
-FORTUNATELY, it was simply because the output file was named incorrectly. Moving on.
-Changed text editing mode to append so previous writes are logged downwards
-
-I found a peak detection algorithm and a new base audio handler program from Laveena's scond post on the below link.
-https://stackoverflow.com/questions/48653745/continuesly-streaming-audio-signal-real-time-infinitely-python
-I wated to integrate user delica's peak detection algorithm into this base handler but 
-
-the function is 'def __init__(self, array, lag, threshold, influence):' and I cannot figure out what self and array are asking for, and there is no documentation.
-There aren't a lot of "readymades" for python realtime peak detection from what I have seen so I will work with this for a little longer before looking more.
-
-Currently I have lag = 30, threshold = 5, and influence as 0. I have array as data which is reading integers from the stream, which is what gets printed to the console. 
-Worth noting that I have a pluck routed from Rack to Soundflower and I am getting amplitude information from Rack printed to the console, so at least that works.
-Unsure what self even is or what I need to enter for it. Gonna look more into that.
-
-After learning more about arrays, classes and understanding how some of the various peak detection algorithms work, I don't think using actual peak detection is feasible for my knowledge level. 
-I think it would be much more reasonable to just have a sentence get selected every time the amplitude of the input signal is greater than a threshold value.
-
-I found a person who created a script that detects "taps" in pyaudio, and it seems to work fairly okay.
-User is Russell Borogove on StackOverflow
-I am using a shortened edited version of this code made by user1405612
-https://stackoverflow.com/questions/4160175/detect-tap-with-pyaudio-from-live-mic
-
-I've integrated my text selector into the new audio handler, but I can't monitor the output text live, the text updates after the program stops.
-I don't think it has to do with changes not being saved while I am viewing the file because using `with open()` should mean the file is closed every write instance.
-
-It turns out that Atom auto-refreshes text files, so now it's just a matter of fine tuning settings for the presentation. 
-Everything is working though.
+### Closing
+While this program didn't meet my original expectations, that is because my original expectations were far too lofty. Some things I would potentially like to improve in the future are the audio processing, and I also think even a simple user interface would make this far more accessible.

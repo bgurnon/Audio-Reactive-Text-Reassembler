@@ -6,7 +6,7 @@ import writer
 INITIAL_TAP_THRESHOLD = 0.01
 FORMAT = pyaudio.paInt16 
 SHORT_NORMALIZE = (1.0/32768.0)
-INPUT_DEVICE_INDEX = 4
+INPUT_DEVICE_INDEX = 11
 CHANNELS = 1
 RATE = 44100  
 INPUT_BLOCK_TIME = 0.05
@@ -72,7 +72,7 @@ for i in range(10000):
         if noisycount > OVERSENSITIVE:
             tap_threshold *= 1.1        # turn down the sensitivity
 
-    else:    # if its to quiet...
+    else:    # if it's too quiet...
 
         if 1 <= noisycount <= MAX_TAP_BLOCKS:
             writer.write()      # triggers sentence selection

@@ -7,3 +7,5 @@ def write():
         paragraph = input_text.read().replace('\n', ' ')
         string = parser.find_sentences(paragraph)
         output_text.write(random.choice(string) + '\n')
+
+write()
